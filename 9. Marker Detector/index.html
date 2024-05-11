@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Marker Detector</title>
+      <style>
+         video {
+            border: 2px solid;
+         }
+         canvas {
+            border: 2px solid blue;
+         }
+      </style>
+   </head>
+   <body>
+      <canvas id="myCanvas"></canvas>
+      <script src="markerDetector.js"></script>
+      <script>
+         const myVideo = document.createElement("video");
+         const ctx = myCanvas.getContext("2d");
+         const markerDetector = new MarkerDetector();
+
+         const distance = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y);
+
+         const loop = () => {
+            ctx.drawImage(myVideo, 0, 0, myCanvas.width, myCanvas.height);
+            const imgData = ctx.getImageData(0, 0, myCanvas.width, myCanvas.height);
+            const res = markerDetector.detect(imgData);
+            if (res) {
+               ctx.fillStyle = "red";
+               for (const point of res.leftMarker.points) {
+                  ctx.fillRect(point.x, point.y, 1, 1);
+               }
+               ctx.fillStyle = "yellow";
+               for (const point of res.rightMarker.points) {
+                  ctx.fillRect(point.x, point.y, 1, 1);
+               }
+            }
+            requestAnimationFrame(loop);
+         };
+
+         navigator.mediaDevices.getUserMedia({ video: true })
+            .then((rawData) => {
+               myVideo.srcObject = rawData;
+               myVideo.play();
+               myVideo.onloadeddata = () => {
+                  myCanvas.width = myVideo.videoWidth;
+                  myCanvas.height = myVideo.videoHeight;
+                  loop();
+               };
+            })
+            .catch((err) => {
+               alert(err);
+            });
+      </script>
+   </body>
+</html>
