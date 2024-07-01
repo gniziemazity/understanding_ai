@@ -20,11 +20,13 @@ const world = worldInfo
    : new World(new Graph());
 */
 const viewport = new Viewport(carCanvas, world.zoom, world.offset);
-const miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
 
 const N=500;
 const cars=generateCars(N);
 let bestCar=cars[0];
+
+const miniMap = new MiniMap(miniMapCanvas, world.graph, 300, cars);
+
 if(localStorage.getItem("bestBrain")){
     for(let i=0;i<cars.length;i++){
         cars[i].brain=JSON.parse(
